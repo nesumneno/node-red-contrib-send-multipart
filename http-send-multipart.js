@@ -129,25 +129,26 @@ module.exports = function(RED) {
                             shape: "ring",
                             text: statusText
                         });
-                    }
-                    msg.payload = body;
-                    msg.statusCode = resp.statusCode || resp.status;
-                    msg.['http-send-multipart-headers'] = resp.headers;
-                    msg.['http-send-multipart-options'] = options;
-
-                    if (node.ret !== "bin") {
-                        msg.payload = body.toString('utf8'); // txt
-
-                        if (node.ret === "obj") {
-                            try {
-                                msg.payload = JSON.parse(body);
-                            } catch (e) {
-                                node.warn(RED._("httpSendMultipart.errors.json-error"));
+                    } else {
+                        msg.payload = body;
+                        msg.statusCode = resp.statusCode || resp.status;
+                        msg['http-send-multipart-headers'] = resp.headers;
+                        msg['http-send-multipart-options'] = options;
+    
+                        if (node.ret !== "bin") {
+                            msg.payload = body.toString('utf8'); // txt
+    
+                            if (node.ret === "obj") {
+                                try {
+                                    msg.payload = JSON.parse(body);
+                                } catch (e) {
+                                    node.warn(RED._("httpSendMultipart.errors.json-error"));
+                                }
                             }
                         }
+    
+                        node.send(msg);
                     }
-
-                    node.send(msg);
                 });
 
             }
